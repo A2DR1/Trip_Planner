@@ -12,7 +12,7 @@
     "@anthropic-ai/sdk": "^0.95.2",
     "@react-native-async-storage/async-storage": "^3.0.2",
     "@react-navigation/native": "^7.2.4",
-    "expo": "~55.0.0",
+    "expo": "^55.0.23",
     "expo-constants": "^55.0.16",
     "expo-linear-gradient": "^55.0.13",
     "expo-linking": "^55.0.15",
@@ -29,7 +29,7 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
-    "@types/react": "~19.2.10",
+    "@types/react": "~19.1.0",
     "typescript": "~5.9.2"
   },
   "private": true
