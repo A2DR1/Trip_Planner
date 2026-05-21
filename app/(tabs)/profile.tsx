@@ -3,7 +3,6 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { signOut } from 'firebase/auth';
-import { LinearGradient } from 'expo-linear-gradient';
 import { auth } from '../../lib/firebase';
 import { useAuthStore } from '../../store/authStore';
 import { useTripStore } from '../../store/tripStore';
@@ -34,34 +33,47 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={[Colors.orange, Colors.primary]} style={styles.header}>
-        <View style={styles.avatarCircle}>
-          <Text style={styles.avatarText}>{initials}</Text>
-        </View>
-        <Text style={styles.name}>{user?.displayName}</Text>
-        <Text style={styles.email}>{user?.email}</Text>
-      </LinearGradient>
+      {/* Simple top bar */}
+      <View style={styles.topBar}>
+        <Text style={styles.pageTitle}>Profile</Text>
+      </View>
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Stats */}
-        <View style={styles.statsCard}>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{trips.length}</Text>
-            <Text style={styles.statLabel}>Total Trips</Text>
+        {/* Profile card */}
+        <View style={styles.profileCard}>
+          <View style={styles.avatarWrap}>
+            <View style={styles.avatarCircle}>
+              <Text style={styles.avatarText}>{initials}</Text>
+            </View>
+            <View style={styles.editBadge}>
+              <Text style={{ fontSize: 11, color: Colors.cream }}>✏</Text>
+            </View>
           </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{upcoming}</Text>
-            <Text style={styles.statLabel}>Upcoming</Text>
+          <Text style={styles.name}>{user?.displayName}</Text>
+          <Text style={styles.email}>{user?.email}</Text>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>STUDENT EXPLORER</Text>
           </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{past}</Text>
-            <Text style={styles.statLabel}>Completed</Text>
+          {/* Stats row */}
+          <View style={styles.statsRow}>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{trips.length}</Text>
+              <Text style={styles.statLabel}>TOTAL</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{upcoming}</Text>
+              <Text style={styles.statLabel}>UPCOMING</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{past}</Text>
+              <Text style={styles.statLabel}>DONE</Text>
+            </View>
           </View>
         </View>
 
-        {/* Menu */}
+        {/* Settings list */}
         <View style={styles.menu}>
           <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/(tabs)/trips/create')}>
             <Text style={styles.menuEmoji}>➕</Text>
@@ -73,7 +85,7 @@ export default function ProfileScreen() {
             <Text style={styles.menuLabel}>AI Trip Planner</Text>
             <Text style={styles.menuChevron}>›</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/(tabs)/trips/index')}>
+          <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0 }]} onPress={() => router.push('/(tabs)/trips/index')}>
             <Text style={styles.menuEmoji}>🗺️</Text>
             <Text style={styles.menuLabel}>My Trips</Text>
             <Text style={styles.menuChevron}>›</Text>
@@ -81,49 +93,86 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.menu}>
-          <TouchableOpacity style={[styles.menuItem, styles.signOutItem]} onPress={handleSignOut}>
+          <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0 }]} onPress={handleSignOut}>
             <Text style={styles.menuEmoji}>🚪</Text>
-            <Text style={[styles.menuLabel, { color: Colors.danger }]}>Sign Out</Text>
+            <Text style={[styles.menuLabel, { color: Colors.coral }]}>Sign Out</Text>
           </TouchableOpacity>
         </View>
 
         <Text style={styles.version}>TripMate v1.0 · Made for students 🎓</Text>
-        <View style={{ height: 32 }} />
+        <View style={{ height: 100 }} />
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  header: { paddingTop: 60, paddingBottom: 32, alignItems: 'center', paddingHorizontal: 24 },
-  avatarCircle: {
-    width: 80, height: 80, borderRadius: 40,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    justifyContent: 'center', alignItems: 'center', marginBottom: 12,
-  },
-  avatarText: { fontSize: 30, fontWeight: '900', color: '#fff' },
-  name: { fontSize: 22, fontWeight: '900', color: '#fff' },
-  email: { fontSize: 14, color: 'rgba(255,255,255,0.8)', marginTop: 4 },
+  container: { flex: 1, backgroundColor: Colors.cream },
+  topBar: { paddingTop: 60, paddingHorizontal: 24, paddingBottom: 12 },
+  pageTitle: { fontSize: 32, fontWeight: '800', letterSpacing: -0.5, color: Colors.ink },
   scroll: { flex: 1 },
-  statsCard: {
-    backgroundColor: '#fff', margin: 20, borderRadius: 20, padding: 20,
-    flexDirection: 'row', justifyContent: 'space-around',
-    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 10, elevation: 3,
+  profileCard: {
+    backgroundColor: Colors.card,
+    marginHorizontal: 20,
+    marginTop: 8,
+    borderRadius: 22,
+    padding: 22,
+    alignItems: 'center',
+    shadowColor: '#281408',
+    shadowOpacity: 0.10,
+    shadowRadius: 15,
+    elevation: 5,
   },
-  statItem: { alignItems: 'center' },
-  statValue: { fontSize: 28, fontWeight: '900', color: Colors.text },
-  statLabel: { fontSize: 12, color: Colors.textSecondary, marginTop: 4, fontWeight: '600' },
-  statDivider: { width: 1, backgroundColor: Colors.border },
+  avatarWrap: { position: 'relative', marginBottom: 12 },
+  avatarCircle: {
+    width: 88, height: 88, borderRadius: 44,
+    backgroundColor: Colors.coral,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  avatarText: { fontSize: 36, fontWeight: '900', color: '#fff' },
+  editBadge: {
+    position: 'absolute', bottom: 0, right: 0,
+    width: 26, height: 26, borderRadius: 26,
+    backgroundColor: Colors.ink,
+    borderWidth: 2, borderColor: Colors.card,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  name: { fontSize: 22, fontWeight: '800', color: Colors.ink, letterSpacing: -0.2 },
+  email: { fontSize: 13, color: Colors.ink2, marginTop: 2 },
+  badge: {
+    marginTop: 10,
+    paddingHorizontal: 12, paddingVertical: 5,
+    borderRadius: 999,
+    backgroundColor: Colors.butter + 'AA',
+  },
+  badgeText: { fontSize: 11, fontWeight: '800', color: Colors.ink, letterSpacing: 0.5 },
+  statsRow: {
+    flexDirection: 'row',
+    borderTopWidth: 1, borderTopColor: Colors.line,
+    paddingTop: 18, marginTop: 16,
+    width: '100%',
+  },
+  statItem: { flex: 1, alignItems: 'center' },
+  statValue: { fontSize: 22, fontWeight: '800', color: Colors.ink },
+  statLabel: { fontSize: 10, color: Colors.ink2, fontWeight: '700', textTransform: 'uppercase', marginTop: 2, letterSpacing: 0.4 },
+  statDivider: { width: 1, backgroundColor: Colors.line },
   menu: {
-    backgroundColor: '#fff', marginHorizontal: 20, marginBottom: 12, borderRadius: 16,
+    backgroundColor: Colors.card,
+    marginHorizontal: 20,
+    marginTop: 12,
+    borderRadius: 18,
     overflow: 'hidden',
-    shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 2,
+    shadowColor: '#281408',
+    shadowOpacity: 0.06,
+    shadowRadius: 9,
+    elevation: 3,
   },
-  menuItem: { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderColor: Colors.border },
-  signOutItem: { borderBottomWidth: 0 },
-  menuEmoji: { fontSize: 22, marginRight: 12 },
-  menuLabel: { flex: 1, fontSize: 15, fontWeight: '700', color: Colors.text },
-  menuChevron: { fontSize: 22, color: Colors.textSecondary },
-  version: { textAlign: 'center', color: Colors.textSecondary, fontSize: 12, marginTop: 8 },
+  menuItem: {
+    flexDirection: 'row', alignItems: 'center', padding: 14,
+    paddingHorizontal: 16, borderBottomWidth: 1, borderColor: Colors.line,
+  },
+  menuEmoji: { fontSize: 20, marginRight: 12 },
+  menuLabel: { flex: 1, fontSize: 15, fontWeight: '700', color: Colors.ink },
+  menuChevron: { fontSize: 22, color: Colors.ink2 },
+  version: { textAlign: 'center', color: Colors.ink2, fontSize: 12, marginTop: 16 },
 });

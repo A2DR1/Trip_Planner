@@ -1,9 +1,21 @@
 import { Tabs } from 'expo-router';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { Colors } from '../../constants/colors';
 
-function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
-  return <Text style={{ fontSize: focused ? 26 : 22, opacity: focused ? 1 : 0.5 }}>{emoji}</Text>;
+function TabIcon({ emoji, label, focused }: { emoji: string; label: string; focused: boolean }) {
+  if (focused) {
+    return (
+      <View style={{
+        flexDirection: 'row', alignItems: 'center', gap: 6,
+        backgroundColor: Colors.coral, borderRadius: 999,
+        paddingHorizontal: 14, paddingVertical: 8,
+      }}>
+        <Text style={{ fontSize: 16 }}>{emoji}</Text>
+        <Text style={{ color: '#fff', fontWeight: '800', fontSize: 12 }}>{label}</Text>
+      </View>
+    );
+  }
+  return <Text style={{ fontSize: 20, opacity: 0.6 }}>{emoji}</Text>;
 }
 
 export default function TabsLayout() {
@@ -11,48 +23,31 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textSecondary,
+        tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: '#fff',
-          borderTopColor: Colors.border,
-          borderTopWidth: 1,
-          paddingBottom: 8,
-          paddingTop: 4,
-          height: 64,
+          position: 'absolute',
+          bottom: 18,
+          left: 18,
+          right: 18,
+          backgroundColor: Colors.ink,
+          borderRadius: 28,
+          height: 68,
+          borderTopWidth: 0,
+          paddingBottom: 0,
+          shadowColor: '#000',
+          shadowOpacity: 0.25,
+          shadowRadius: 20,
+          elevation: 10,
         },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '700' },
+        tabBarItemStyle: {
+          paddingVertical: 12,
+        },
       }}
     >
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🏠" focused={focused} />,
-        }}
-      />
-      <Tabs.Screen
-        name="trips/index"
-        options={{
-          title: 'My Trips',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🗺️" focused={focused} />,
-        }}
-      />
-      <Tabs.Screen
-        name="ai-suggest"
-        options={{
-          title: 'AI Suggest',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="✨" focused={focused} />,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Profile',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="👤" focused={focused} />,
-        }}
-      />
-      {/* Hidden screens - accessible via navigation but not shown in tabs */}
+      <Tabs.Screen name="home" options={{ tabBarIcon: ({ focused }) => <TabIcon emoji="🏠" label="Home" focused={focused} /> }} />
+      <Tabs.Screen name="trips/index" options={{ tabBarIcon: ({ focused }) => <TabIcon emoji="🗺️" label="Trips" focused={focused} /> }} />
+      <Tabs.Screen name="ai-suggest" options={{ tabBarIcon: ({ focused }) => <TabIcon emoji="✨" label="AI" focused={focused} /> }} />
+      <Tabs.Screen name="profile" options={{ tabBarIcon: ({ focused }) => <TabIcon emoji="👤" label="Me" focused={focused} /> }} />
       <Tabs.Screen name="trips/[id]" options={{ href: null }} />
       <Tabs.Screen name="trips/create" options={{ href: null }} />
       <Tabs.Screen name="trips/budget" options={{ href: null }} />
