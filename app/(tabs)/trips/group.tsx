@@ -1,17 +1,16 @@
 import { useEffect } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, Share, Alert,
+  StyleSheet, Share,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useTripStore } from '../../../store/tripStore';
 import { Colors } from '../../../constants/colors';
 
 function MemberAvatar({ name }: { name: string }) {
   const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
-  const colors = [Colors.primary, Colors.secondary, Colors.purple, Colors.orange, Colors.blue];
-  const color = colors[name.length % colors.length];
+  const avatarColors = [Colors.coral, Colors.teal, Colors.lilac, Colors.orange, Colors.blue];
+  const color = avatarColors[name.length % avatarColors.length];
   return (
     <View style={[styles.avatar, { backgroundColor: color }]}>
       <Text style={styles.avatarText}>{initials}</Text>
@@ -70,13 +69,13 @@ export default function GroupScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={[Colors.purple, Colors.blue]} style={styles.header}>
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.backText}>‹ Back</Text>
+          <Text style={styles.backBtnText}>‹ Back</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>👥 Group</Text>
-        <Text style={styles.headerSub}>{memberIds.length} member{memberIds.length !== 1 ? 's' : ''} · {trip.title}</Text>
-      </LinearGradient>
+        <Text style={styles.title}>Crew 👥</Text>
+        <Text style={styles.subtitle}>{memberIds.length} member{memberIds.length !== 1 ? 's' : ''} · {trip.title}</Text>
+      </View>
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Members */}
@@ -84,7 +83,7 @@ export default function GroupScreen() {
           <View style={styles.sectionRow}>
             <Text style={styles.sectionTitle}>Members</Text>
             <TouchableOpacity style={styles.inviteBtn} onPress={handleShare}>
-              <Text style={styles.inviteBtnText}>+ Invite</Text>
+              <Text style={styles.inviteBtnText}>Invite +</Text>
             </TouchableOpacity>
           </View>
           {memberIds.map((uid) => {
@@ -104,7 +103,7 @@ export default function GroupScreen() {
                 </View>
                 <Text style={[
                   styles.balanceAmount,
-                  { color: balance > 0 ? Colors.success : balance < 0 ? Colors.danger : Colors.textSecondary }
+                  { color: balance > 0 ? Colors.success : balance < 0 ? Colors.danger : Colors.ink2 }
                 ]}>
                   {balance > 0 ? '+' : ''}{balance.toFixed(2)}
                 </Text>
@@ -157,45 +156,48 @@ export default function GroupScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  header: { paddingTop: 56, paddingBottom: 24, paddingHorizontal: 20 },
-  backBtn: { marginBottom: 8 },
-  backText: { fontSize: 16, color: '#fff', fontWeight: '600', opacity: 0.85 },
-  headerTitle: { fontSize: 24, fontWeight: '900', color: '#fff' },
-  headerSub: { color: 'rgba(255,255,255,0.8)', fontSize: 13, marginTop: 2 },
+  container: { flex: 1, backgroundColor: Colors.cream },
+  header: { paddingTop: 60, paddingBottom: 16, paddingHorizontal: 24 },
+  backBtn: { marginBottom: 12 },
+  backBtnText: { fontSize: 16, color: Colors.coral, fontWeight: '600' },
   scroll: { flex: 1 },
-  section: { padding: 20, paddingBottom: 8 },
+  section: { paddingHorizontal: 20, paddingTop: 20 },
   sectionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  sectionTitle: { fontSize: 16, fontWeight: '800', color: Colors.text },
-  inviteBtn: { backgroundColor: Colors.purple, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 6 },
-  inviteBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
-  memberRow: {
-    backgroundColor: '#fff', borderRadius: 16, flexDirection: 'row', alignItems: 'center',
-    padding: 14, marginBottom: 8,
-    shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 2,
+  sectionTitle: { fontSize: 16, fontWeight: '800', color: Colors.ink },
+  inviteBtn: {
+    backgroundColor: Colors.lilac + '30', borderRadius: 999,
+    paddingHorizontal: 14, paddingVertical: 6,
   },
-  avatar: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
-  avatarText: { color: '#fff', fontWeight: '900', fontSize: 15 },
+  inviteBtnText: { color: Colors.ink, fontWeight: '700', fontSize: 12 },
+  memberRow: {
+    backgroundColor: Colors.card, borderRadius: 18, flexDirection: 'row', alignItems: 'center',
+    padding: 16, marginBottom: 8,
+    shadowColor: '#281408', shadowOpacity: 0.06, shadowRadius: 9, elevation: 2,
+  },
+  avatar: { width: 48, height: 48, borderRadius: 48, justifyContent: 'center', alignItems: 'center', marginRight: 12, borderWidth: 3, borderColor: Colors.card },
+  avatarText: { color: '#fff', fontWeight: '900', fontSize: 16 },
   memberInfo: { flex: 1 },
-  memberName: { fontSize: 15, fontWeight: '700', color: Colors.text },
-  memberBalance: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
+  memberName: { fontSize: 15, fontWeight: '700', color: Colors.ink },
+  memberBalance: { fontSize: 12, color: Colors.ink2, marginTop: 2 },
   balanceAmount: { fontSize: 16, fontWeight: '900' },
   statsCard: {
-    backgroundColor: '#fff', margin: 20, marginTop: 0, borderRadius: 20, padding: 20,
+    backgroundColor: Colors.ink, marginHorizontal: 20, marginTop: 4, borderRadius: 22, padding: 22,
     flexDirection: 'row', justifyContent: 'space-around',
-    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 10, elevation: 3,
   },
   statItem: { alignItems: 'center' },
-  statLabel: { fontSize: 11, color: Colors.textSecondary, fontWeight: '700', textTransform: 'uppercase' },
-  statValue: { fontSize: 20, fontWeight: '900', color: Colors.text, marginTop: 4 },
-  statDivider: { width: 1, backgroundColor: Colors.border },
+  statLabel: { fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 4 },
+  statValue: { fontSize: 22, fontWeight: '800', color: '#fff' },
+  statDivider: { width: 1, backgroundColor: 'rgba(255,255,255,0.12)' },
   expenseRow: {
-    backgroundColor: '#fff', borderRadius: 12, flexDirection: 'row', alignItems: 'center',
-    padding: 12, marginBottom: 8, gap: 10,
+    backgroundColor: Colors.card, borderRadius: 14, flexDirection: 'row', alignItems: 'center',
+    padding: 14, marginBottom: 8, gap: 10,
+    shadowColor: '#281408', shadowOpacity: 0.04, shadowRadius: 6, elevation: 1,
   },
   expenseBody: { flex: 1 },
-  expenseTitle: { fontSize: 14, fontWeight: '700', color: Colors.text },
-  expensePaidBy: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
-  expenseAmt: { fontSize: 15, fontWeight: '900', color: Colors.text },
-  emptyText: { color: Colors.textSecondary, fontStyle: 'italic', paddingVertical: 12 },
+  expenseTitle: { fontSize: 14, fontWeight: '700', color: Colors.ink },
+  expensePaidBy: { fontSize: 12, color: Colors.ink2, marginTop: 2 },
+  expenseAmt: { fontSize: 15, fontWeight: '800', color: Colors.ink },
+  emptyText: { color: Colors.ink2, fontStyle: 'italic', paddingVertical: 8 },
+  title: { fontSize: 28, fontWeight: '800', color: Colors.ink, letterSpacing: -0.4 },
+  subtitle: { fontSize: 14, color: Colors.ink2, marginTop: 4 },
 });

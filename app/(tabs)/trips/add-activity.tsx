@@ -1,8 +1,5 @@
 import { useState } from 'react';
-import {
-  View, Text, TextInput, TouchableOpacity,
-  StyleSheet, ScrollView, Alert,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTripStore } from '../../../store/tripStore';
 import { Colors } from '../../../constants/colors';
@@ -40,59 +37,103 @@ export default function AddActivityScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Sheet handle */}
+      <View style={styles.handle} />
+
       <View style={styles.header}>
+        <Text style={styles.title}>Add Activity</Text>
         <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.backText}>‹ Cancel</Text>
+          <Text style={styles.cancelText}>Cancel</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Add Activity</Text>
-        <View style={{ width: 60 }} />
       </View>
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.form}>
-          <Text style={styles.label}>Activity Name</Text>
-          <TextInput style={styles.input} placeholder="e.g. Beach time 🌊" placeholderTextColor={Colors.textSecondary} value={title} onChangeText={setTitle} />
+          {/* Emoji + title row */}
+          <View style={styles.emojiTitleRow}>
+            <View style={styles.emojiDisplay}>
+              <Text style={{ fontSize: 28 }}>{emoji}</Text>
+            </View>
+            <TextInput
+              style={[styles.input, styles.titleInput]}
+              placeholder="Activity name"
+              placeholderTextColor={Colors.ink2}
+              value={title}
+              onChangeText={setTitle}
+            />
+          </View>
 
-          <Text style={styles.label}>Location</Text>
-          <TextInput style={styles.input} placeholder="e.g. South Beach" placeholderTextColor={Colors.textSecondary} value={location} onChangeText={setLocation} />
+          {/* Emoji picker */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.emojiScroll}>
+            {ACTIVITY_EMOJIS.map((e) => (
+              <TouchableOpacity
+                key={e}
+                style={[styles.emojiBtn, emoji === e && styles.emojiBtnActive]}
+                onPress={() => setEmoji(e)}
+              >
+                <Text style={{ fontSize: 22 }}>{e}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
 
-          <Text style={styles.label}>Date (YYYY-MM-DD)</Text>
-          <TextInput style={styles.input} placeholder="2025-03-15" placeholderTextColor={Colors.textSecondary} value={day} onChangeText={setDay} keyboardType="numbers-and-punctuation" />
+          {/* Date & time row */}
+          <View style={styles.twoCol}>
+            <View style={styles.colField}>
+              <Text style={styles.label}>DATE</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="YYYY-MM-DD"
+                placeholderTextColor={Colors.ink2}
+                value={day}
+                onChangeText={setDay}
+                keyboardType="numbers-and-punctuation"
+              />
+            </View>
+            <View style={styles.colField}>
+              <Text style={styles.label}>TIME</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="09:00"
+                placeholderTextColor={Colors.ink2}
+                value={time}
+                onChangeText={setTime}
+                keyboardType="numbers-and-punctuation"
+              />
+            </View>
+          </View>
 
-          <Text style={styles.label}>Time (HH:MM)</Text>
-          <TextInput style={styles.input} placeholder="09:00" placeholderTextColor={Colors.textSecondary} value={time} onChangeText={setTime} keyboardType="numbers-and-punctuation" />
+          <Text style={styles.label}>LOCATION</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g. South Beach"
+            placeholderTextColor={Colors.ink2}
+            value={location}
+            onChangeText={setLocation}
+          />
 
-          <Text style={styles.label}>Notes (optional)</Text>
+          <Text style={styles.label}>NOTES (OPTIONAL)</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
-            placeholder="Any details, reminders, or tips..."
-            placeholderTextColor={Colors.textSecondary}
+            placeholder="Any details, tips, or reminders..."
+            placeholderTextColor={Colors.ink2}
             value={notes}
             onChangeText={setNotes}
             multiline
             numberOfLines={3}
           />
 
-          <Text style={styles.label}>Pick an Emoji</Text>
-          <View style={styles.emojiGrid}>
-            {ACTIVITY_EMOJIS.map((e) => (
-              <TouchableOpacity
-                key={e}
-                style={[styles.emojiBtn, emoji === e && styles.emojiBtnSelected]}
-                onPress={() => setEmoji(e)}
-              >
-                <Text style={{ fontSize: 24 }}>{e}</Text>
-              </TouchableOpacity>
-            ))}
+          <View style={styles.actions}>
+            <TouchableOpacity style={styles.cancelBtn} onPress={() => router.back()}>
+              <Text style={styles.cancelBtnText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.addBtn, loading && { opacity: 0.6 }]}
+              onPress={handleAdd}
+              disabled={loading}
+            >
+              <Text style={styles.addBtnText}>{loading ? 'Adding...' : 'Add ✅'}</Text>
+            </TouchableOpacity>
           </View>
-
-          <TouchableOpacity
-            style={[styles.addBtn, loading && { opacity: 0.6 }]}
-            onPress={handleAdd}
-            disabled={loading}
-          >
-            <Text style={styles.addBtnText}>{loading ? 'Adding...' : 'Add to Itinerary ✅'}</Text>
-          </TouchableOpacity>
         </View>
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -101,25 +142,42 @@ export default function AddActivityScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  header: {
-    paddingTop: 56, paddingHorizontal: 20, paddingBottom: 16,
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    backgroundColor: '#fff', borderBottomWidth: 1, borderColor: Colors.border,
-  },
-  backText: { fontSize: 16, color: Colors.primary, fontWeight: '600' },
-  headerTitle: { fontSize: 18, fontWeight: '800', color: Colors.text },
+  container: { flex: 1, backgroundColor: Colors.cream },
+  handle: { width: 44, height: 5, borderRadius: 3, backgroundColor: Colors.line, alignSelf: 'center', marginTop: 12, marginBottom: 8 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 22, paddingBottom: 16 },
+  title: { fontSize: 22, fontWeight: '800', color: Colors.ink, letterSpacing: -0.3 },
+  cancelText: { fontSize: 15, color: Colors.coral, fontWeight: '600' },
   scroll: { flex: 1 },
-  form: { padding: 20 },
-  label: { fontSize: 13, fontWeight: '700', color: Colors.textSecondary, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 },
+  form: { paddingHorizontal: 20 },
+  emojiTitleRow: { flexDirection: 'row', gap: 10, marginBottom: 12 },
+  emojiDisplay: {
+    width: 60, height: 60, borderRadius: 16,
+    backgroundColor: Colors.butter + '60', borderWidth: 1.5, borderColor: Colors.butter,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  titleInput: { flex: 1, borderColor: Colors.coral },
+  emojiScroll: { marginBottom: 16 },
+  emojiBtn: {
+    width: 44, height: 44, borderRadius: 12, marginRight: 8,
+    backgroundColor: Colors.card, justifyContent: 'center', alignItems: 'center',
+    borderWidth: 2, borderColor: 'transparent',
+  },
+  emojiBtnActive: { borderColor: Colors.butter, backgroundColor: Colors.butter + '40' },
+  twoCol: { flexDirection: 'row', gap: 10 },
+  colField: { flex: 1 },
+  label: { fontSize: 10, fontWeight: '800', color: Colors.ink2, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 8 },
   input: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 14, fontSize: 15,
-    color: Colors.text, marginBottom: 16, borderWidth: 1, borderColor: Colors.border,
+    backgroundColor: Colors.card, borderRadius: 14, padding: 14,
+    fontSize: 15, fontWeight: '600', color: Colors.ink,
+    borderWidth: 1.5, borderColor: Colors.line, marginBottom: 14,
   },
   textArea: { height: 80, textAlignVertical: 'top' },
-  emojiGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 24 },
-  emojiBtn: { width: 48, height: 48, borderRadius: 12, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: 'transparent' },
-  emojiBtnSelected: { borderColor: Colors.primary, backgroundColor: Colors.primary + '15' },
-  addBtn: { backgroundColor: Colors.secondary, borderRadius: 16, padding: 18, alignItems: 'center' },
-  addBtnText: { color: '#fff', fontWeight: '900', fontSize: 17 },
+  actions: { flexDirection: 'row', gap: 10, marginTop: 4 },
+  cancelBtn: {
+    flex: 1, borderRadius: 16, padding: 16, alignItems: 'center',
+    borderWidth: 1.5, borderColor: Colors.line,
+  },
+  cancelBtnText: { color: Colors.ink2, fontWeight: '700', fontSize: 14 },
+  addBtn: { flex: 2, backgroundColor: Colors.teal, borderRadius: 16, padding: 16, alignItems: 'center' },
+  addBtnText: { color: '#fff', fontWeight: '800', fontSize: 15 },
 });

@@ -3,7 +3,6 @@ import {
   View, Text, TextInput, TouchableOpacity,
   StyleSheet, ScrollView, ActivityIndicator, Alert,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { suggestDestinations, generateItinerary, generatePackingList } from '../../lib/claude';
 import { Colors } from '../../constants/colors';
 
@@ -88,10 +87,13 @@ export default function AISuggestScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={[Colors.purple, Colors.primary]} style={styles.header}>
-        <Text style={styles.headerTitle}>✨ AI Trip Planner</Text>
+      <View style={styles.header}>
+        <View style={styles.sparkleBox}>
+          <Text style={{ fontSize: 22 }}>✨</Text>
+        </View>
+        <Text style={styles.headerTitle}>AI Trip Planner</Text>
         <Text style={styles.headerSub}>Powered by Claude</Text>
-      </LinearGradient>
+      </View>
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Mode selector */}
@@ -152,13 +154,11 @@ export default function AISuggestScreen() {
             onPress={handleGenerate}
             disabled={loading}
           >
-            <LinearGradient colors={[Colors.purple, Colors.primary]} style={styles.generateBtnGradient}>
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.generateBtnText}>✨ Generate with AI</Text>
-              )}
-            </LinearGradient>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.generateBtnText}>✨ Generate with AI</Text>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -179,44 +179,67 @@ export default function AISuggestScreen() {
           </View>
         )}
 
-        <View style={{ height: 40 }} />
+        <View style={{ height: 100 }} />
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  header: { paddingTop: 60, paddingBottom: 24, paddingHorizontal: 24 },
-  headerTitle: { fontSize: 28, fontWeight: '900', color: '#fff' },
-  headerSub: { color: 'rgba(255,255,255,0.8)', fontSize: 14, marginTop: 4 },
+  container: { flex: 1, backgroundColor: Colors.cream },
+  header: { paddingTop: 60, paddingBottom: 20, paddingHorizontal: 24 },
+  sparkleBox: {
+    width: 44, height: 44, borderRadius: 16,
+    backgroundColor: Colors.ink, justifyContent: 'center', alignItems: 'center', marginBottom: 12,
+  },
+  headerTitle: { fontSize: 30, fontWeight: '800', color: Colors.ink, letterSpacing: -0.5 },
+  headerSub: { color: Colors.ink2, fontSize: 14, marginTop: 4 },
   scroll: { flex: 1 },
-  modeSelector: { flexDirection: 'row', padding: 16, gap: 8 },
+  modeSelector: { flexDirection: 'row', paddingHorizontal: 16, paddingBottom: 8, gap: 8 },
   modeBtn: {
-    flex: 1, backgroundColor: '#fff', borderRadius: 16, padding: 12, alignItems: 'center',
-    borderWidth: 2, borderColor: 'transparent',
-    shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 6, elevation: 2,
+    flex: 1,
+    backgroundColor: Colors.card,
+    borderRadius: 18,
+    padding: 14,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.line,
   },
-  modeBtnActive: { borderColor: Colors.purple, backgroundColor: Colors.purple + '10' },
-  modeEmoji: { fontSize: 24, marginBottom: 4 },
-  modeLabel: { fontSize: 11, fontWeight: '800', color: Colors.textSecondary, textAlign: 'center' },
-  modeLabelActive: { color: Colors.purple },
-  modeDesc: { fontSize: 9, color: Colors.textSecondary, textAlign: 'center', marginTop: 2 },
+  modeBtnActive: { backgroundColor: Colors.ink, borderColor: Colors.ink },
+  modeEmoji: { fontSize: 22, marginBottom: 6 },
+  modeLabel: { fontSize: 11, fontWeight: '800', color: Colors.ink2, textAlign: 'center' },
+  modeLabelActive: { color: Colors.cream },
+  modeDesc: { fontSize: 9, color: Colors.ink2, textAlign: 'center', marginTop: 2 },
   form: { paddingHorizontal: 20 },
-  label: { fontSize: 13, fontWeight: '700', color: Colors.textSecondary, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 },
+  label: {
+    fontSize: 11, fontWeight: '800', color: Colors.ink2,
+    marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.6,
+  },
   input: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 14, fontSize: 15,
-    color: Colors.text, marginBottom: 14, borderWidth: 1, borderColor: Colors.border,
+    backgroundColor: Colors.card, borderRadius: 14,
+    paddingVertical: 14, paddingHorizontal: 16,
+    fontSize: 15, color: Colors.ink, marginBottom: 16,
+    borderWidth: 1.5, borderColor: Colors.line,
+    fontWeight: '600',
   },
-  generateBtn: { borderRadius: 16, overflow: 'hidden', marginTop: 8, marginBottom: 20 },
-  generateBtnGradient: { padding: 18, alignItems: 'center' },
-  generateBtnText: { color: '#fff', fontWeight: '900', fontSize: 17 },
+  generateBtn: {
+    backgroundColor: Colors.coral, borderRadius: 16,
+    padding: 16, alignItems: 'center', marginTop: 4, marginBottom: 20,
+  },
+  generateBtnText: { color: '#fff', fontWeight: '800', fontSize: 15 },
   resultCard: {
-    backgroundColor: '#fff', margin: 20, marginTop: 0, borderRadius: 20, padding: 20,
-    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 12, elevation: 4,
+    backgroundColor: Colors.card,
+    marginHorizontal: 20,
+    marginTop: 0,
+    borderRadius: 22,
+    padding: 20,
+    shadowColor: '#281408',
+    shadowOpacity: 0.10,
+    shadowRadius: 15,
+    elevation: 5,
   },
-  resultTitle: { fontSize: 18, fontWeight: '900', color: Colors.text, marginBottom: 12 },
-  resultText: { fontSize: 14, color: Colors.text, lineHeight: 22 },
+  resultTitle: { fontSize: 18, fontWeight: '800', color: Colors.ink, marginBottom: 12 },
+  resultText: { fontSize: 14, color: Colors.ink, lineHeight: 22 },
   loadingCard: { alignItems: 'center', padding: 32 },
-  loadingText: { color: Colors.textSecondary, marginTop: 12, fontSize: 14, textAlign: 'center' },
+  loadingText: { color: Colors.ink2, marginTop: 12, fontSize: 14, textAlign: 'center' },
 });

@@ -8,37 +8,57 @@ import {
   StatusBar,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../store/authStore';
 import { useTripStore } from '../../store/tripStore';
 import { Colors } from '../../constants/colors';
 import { Trip } from '../../types';
 
-function TripCard({ trip, onPress }: { trip: Trip; onPress: () => void }) {
+function HeroTripCard({ trip, onPress }: { trip: Trip; onPress: () => void }) {
   const start = new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   const end = new Date(trip.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   const daysUntil = Math.ceil((new Date(trip.startDate).getTime() - Date.now()) / 86400000);
 
   return (
-    <TouchableOpacity style={styles.tripCard} onPress={onPress} activeOpacity={0.85}>
-      <LinearGradient
-        colors={[trip.coverColor, trip.coverColor + 'CC']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.tripCardGradient}
-      >
-        <Text style={styles.tripEmoji}>{trip.coverEmoji}</Text>
-        <View style={styles.tripCardBody}>
-          <Text style={styles.tripTitle}>{trip.title}</Text>
-          <Text style={styles.tripDest}>📍 {trip.destination}</Text>
-          <Text style={styles.tripDates}>{start} → {end}</Text>
-        </View>
+    <TouchableOpacity style={styles.heroCard} onPress={onPress} activeOpacity={0.92}>
+      {/* Photo placeholder area */}
+      <View style={[styles.heroPhoto, { backgroundColor: trip.coverColor + '30' }]}>
+        <Text style={styles.heroEmoji}>{trip.coverEmoji}</Text>
         {daysUntil > 0 && (
           <View style={styles.countdownBadge}>
-            <Text style={styles.countdownText}>{daysUntil}d</Text>
+            <Text style={styles.countdownText}>in {daysUntil}d</Text>
           </View>
         )}
-      </LinearGradient>
+        <View style={[styles.statusBadge, { backgroundColor: daysUntil > 0 ? Colors.butter : Colors.teal }]}>
+          <Text style={styles.statusText}>{daysUntil > 0 ? 'Upcoming' : 'Active'}</Text>
+        </View>
+      </View>
+      {/* Content */}
+      <View style={styles.heroContent}>
+        <Text style={styles.heroTitle}>{trip.title}</Text>
+        <View style={styles.heroDetails}>
+          <Text style={styles.heroDetailText}>📍 {trip.destination}</Text>
+          <Text style={styles.heroDetailText}>  ·  </Text>
+          <Text style={styles.heroDetailText}>🗓 {start} – {end}</Text>
+        </View>
+        {/* Avatar stack */}
+        <View style={styles.avatarStack}>
+          {[Colors.coral, Colors.teal, Colors.lilac].map((color, i) => (
+            <View key={i} style={[styles.avatarCircle, { backgroundColor: color, marginLeft: i === 0 ? 0 : -8 }]} />
+          ))}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+function SmallTripCard({ trip, onPress }: { trip: Trip; onPress: () => void }) {
+  return (
+    <TouchableOpacity style={styles.smallCard} onPress={onPress} activeOpacity={0.85}>
+      <View style={[styles.smallEmoji, { backgroundColor: trip.coverColor + '25' }]}>
+        <Text style={{ fontSize: 22 }}>{trip.coverEmoji}</Text>
+      </View>
+      <Text style={styles.smallTitle} numberOfLines={1}>{trip.title}</Text>
+      <Text style={styles.smallDest} numberOfLines={1}>📍 {trip.destination}</Text>
     </TouchableOpacity>
   );
 }
@@ -58,51 +78,63 @@ export default function HomeScreen() {
     .filter((t) => new Date(t.endDate) >= new Date())
     .sort((a, b) => a.startDate.localeCompare(b.startDate));
 
-  const pastTrips = trips
-    .filter((t) => new Date(t.endDate) < new Date())
-    .sort((a, b) => b.startDate.localeCompare(a.startDate));
-
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const greeting = hour < 12 ? 'Good morning,' : hour < 17 ? 'Good afternoon,' : 'Good evening,';
+  const firstName = user?.displayName?.split(' ')[0] || 'Traveler';
+  const heroTrip = upcomingTrips[0] || null;
+  const radarTrips = upcomingTrips.slice(1);
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
-      <LinearGradient colors={[Colors.primary, Colors.orange]} style={styles.header}>
-        <Text style={styles.greeting}>{greeting}, {user?.displayName?.split(' ')[0]} 👋</Text>
-        <Text style={styles.tagline}>Where are we going next?</Text>
-      </LinearGradient>
+      <StatusBar barStyle="dark-content" />
+
+      {/* Top bar */}
+      <View style={styles.topBar}>
+        <View style={styles.logoSmall}>
+          <Text style={styles.logoSmallText}>tm</Text>
+        </View>
+        <View style={styles.avatarBig}>
+          <Text style={styles.avatarBigText}>{firstName[0]?.toUpperCase()}</Text>
+        </View>
+      </View>
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+        {/* Greeting */}
+        <View style={styles.greetingSection}>
+          <Text style={styles.greetingLabel}>{greeting}</Text>
+          <Text style={styles.greetingName}>
+            <Text style={styles.greetingNameMuted}>Hey </Text>
+            <Text style={styles.greetingNameCoral}>{firstName}</Text>
+          </Text>
+        </View>
+
         {/* Quick actions */}
         <View style={styles.quickActions}>
           <TouchableOpacity
-            style={[styles.quickBtn, { backgroundColor: Colors.primary }]}
+            style={styles.quickBtnCoral}
             onPress={() => router.push('/(tabs)/trips/create')}
           >
-            <Text style={styles.quickBtnEmoji}>➕</Text>
-            <Text style={styles.quickBtnText}>New Trip</Text>
+            <Text style={styles.quickBtnText}>New trip +</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.quickBtn, { backgroundColor: Colors.purple }]}
+            style={styles.quickBtnInk}
             onPress={() => router.push('/(tabs)/ai-suggest')}
           >
-            <Text style={styles.quickBtnEmoji}>✨</Text>
-            <Text style={styles.quickBtnText}>AI Suggest</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.quickBtn, { backgroundColor: Colors.secondary }]}
-            onPress={() => router.push('/(tabs)/trips/index')}
-          >
-            <Text style={styles.quickBtnEmoji}>🗺️</Text>
-            <Text style={styles.quickBtnText}>All Trips</Text>
+            <Text style={styles.quickBtnTextLight}>AI Plan ✨</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Upcoming trips */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>✈️ Upcoming Trips</Text>
-          {upcomingTrips.length === 0 ? (
+        {/* Hero trip */}
+        {heroTrip ? (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Next up</Text>
+            <HeroTripCard
+              trip={heroTrip}
+              onPress={() => router.push({ pathname: '/(tabs)/trips/[id]', params: { id: heroTrip.id } })}
+            />
+          </View>
+        ) : (
+          <View style={styles.section}>
             <TouchableOpacity
               style={styles.emptyCard}
               onPress={() => router.push('/(tabs)/trips/create')}
@@ -111,69 +143,101 @@ export default function HomeScreen() {
               <Text style={styles.emptyText}>No trips planned yet!</Text>
               <Text style={styles.emptySubtext}>Tap to plan your first adventure</Text>
             </TouchableOpacity>
-          ) : (
-            upcomingTrips.map((trip) => (
-              <TripCard
-                key={trip.id}
-                trip={trip}
-                onPress={() => router.push({ pathname: '/(tabs)/trips/[id]', params: { id: trip.id } })}
-              />
-            ))
-          )}
-        </View>
-
-        {/* Past trips */}
-        {pastTrips.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>📸 Past Adventures</Text>
-            {pastTrips.slice(0, 3).map((trip) => (
-              <TripCard
-                key={trip.id}
-                trip={trip}
-                onPress={() => router.push({ pathname: '/(tabs)/trips/[id]', params: { id: trip.id } })}
-              />
-            ))}
           </View>
         )}
 
-        <View style={{ height: 24 }} />
+        {/* On the radar */}
+        {radarTrips.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>On the radar</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.radarScroll}>
+              {radarTrips.map((trip) => (
+                <SmallTripCard
+                  key={trip.id}
+                  trip={trip}
+                  onPress={() => router.push({ pathname: '/(tabs)/trips/[id]', params: { id: trip.id } })}
+                />
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        <View style={{ height: 100 }} />
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  header: { paddingTop: 60, paddingBottom: 28, paddingHorizontal: 24 },
-  greeting: { fontSize: 26, fontWeight: '900', color: '#fff' },
-  tagline: { fontSize: 15, color: 'rgba(255,255,255,0.8)', marginTop: 4 },
-  scroll: { flex: 1 },
-  quickActions: { flexDirection: 'row', padding: 20, gap: 10 },
-  quickBtn: {
-    flex: 1,
-    borderRadius: 16,
-    paddingVertical: 14,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+  container: { flex: 1, backgroundColor: Colors.cream },
+  topBar: {
+    paddingTop: 56, paddingHorizontal: 24, paddingBottom: 8,
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
   },
-  quickBtnEmoji: { fontSize: 22, marginBottom: 4 },
-  quickBtnText: { color: '#fff', fontWeight: '800', fontSize: 12 },
-  section: { paddingHorizontal: 20, marginBottom: 8 },
-  sectionTitle: { fontSize: 18, fontWeight: '800', color: Colors.text, marginBottom: 12 },
-  tripCard: { borderRadius: 20, marginBottom: 12, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 10, elevation: 4 },
-  tripCardGradient: { flexDirection: 'row', alignItems: 'center', padding: 16, gap: 12 },
-  tripEmoji: { fontSize: 40 },
-  tripCardBody: { flex: 1 },
-  tripTitle: { fontSize: 18, fontWeight: '800', color: '#fff' },
-  tripDest: { fontSize: 13, color: 'rgba(255,255,255,0.85)', marginTop: 2 },
-  tripDates: { fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2 },
-  countdownBadge: { backgroundColor: 'rgba(255,255,255,0.25)', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 4 },
-  countdownText: { color: '#fff', fontWeight: '900', fontSize: 13 },
-  emptyCard: { backgroundColor: '#fff', borderRadius: 20, padding: 32, alignItems: 'center', borderWidth: 2, borderColor: Colors.border, borderStyle: 'dashed' },
+  logoSmall: {
+    width: 36, height: 36, borderRadius: 12,
+    backgroundColor: Colors.ink, justifyContent: 'center', alignItems: 'center',
+  },
+  logoSmallText: { fontSize: 14, fontWeight: '900', color: Colors.coral },
+  avatarBig: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: Colors.coral, justifyContent: 'center', alignItems: 'center',
+  },
+  avatarBigText: { fontSize: 14, fontWeight: '800', color: '#fff' },
+  scroll: { flex: 1 },
+  greetingSection: { paddingTop: 16, paddingHorizontal: 24, paddingBottom: 4 },
+  greetingLabel: { fontSize: 15, fontWeight: '600', color: Colors.ink2 },
+  greetingName: { fontSize: 34, fontWeight: '800', letterSpacing: -0.5, marginTop: 2 },
+  greetingNameMuted: { color: Colors.ink },
+  greetingNameCoral: { color: Colors.coral },
+  quickActions: { flexDirection: 'row', paddingHorizontal: 24, gap: 10, marginTop: 20, marginBottom: 4 },
+  quickBtnCoral: {
+    flex: 1, backgroundColor: Colors.coral, borderRadius: 16,
+    padding: 14, alignItems: 'center',
+  },
+  quickBtnInk: {
+    flex: 1, backgroundColor: Colors.ink, borderRadius: 16,
+    padding: 14, alignItems: 'center',
+  },
+  quickBtnText: { color: '#fff', fontWeight: '800', fontSize: 14 },
+  quickBtnTextLight: { color: Colors.cream, fontWeight: '800', fontSize: 14 },
+  section: { paddingHorizontal: 24, marginTop: 24 },
+  sectionTitle: { fontSize: 18, fontWeight: '800', color: Colors.ink, marginBottom: 12 },
+  heroCard: {
+    backgroundColor: Colors.card, borderRadius: 28, overflow: 'hidden',
+    shadowColor: '#281408', shadowOpacity: 0.08, shadowRadius: 16, elevation: 4,
+  },
+  heroPhoto: { height: 180, justifyContent: 'center', alignItems: 'center', position: 'relative' },
+  heroEmoji: { fontSize: 64 },
+  countdownBadge: {
+    position: 'absolute', top: 12, right: 12,
+    backgroundColor: Colors.ink, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5,
+  },
+  countdownText: { color: '#fff', fontWeight: '800', fontSize: 12 },
+  statusBadge: {
+    position: 'absolute', top: 12, left: 12,
+    borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5,
+  },
+  statusText: { color: Colors.ink, fontWeight: '800', fontSize: 11 },
+  heroContent: { padding: 18 },
+  heroTitle: { fontSize: 22, fontWeight: '800', letterSpacing: -0.3, color: Colors.ink },
+  heroDetails: { flexDirection: 'row', marginTop: 6, alignItems: 'center' },
+  heroDetailText: { fontSize: 13, color: Colors.ink2 },
+  avatarStack: { flexDirection: 'row', marginTop: 14 },
+  avatarCircle: { width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: Colors.card },
+  emptyCard: {
+    backgroundColor: Colors.card, borderRadius: 20, padding: 32, alignItems: 'center',
+    borderWidth: 2, borderColor: Colors.line, borderStyle: 'dashed',
+  },
   emptyEmoji: { fontSize: 48, marginBottom: 8 },
-  emptyText: { fontSize: 16, fontWeight: '700', color: Colors.text },
-  emptySubtext: { fontSize: 13, color: Colors.textSecondary, marginTop: 4 },
+  emptyText: { fontSize: 16, fontWeight: '700', color: Colors.ink },
+  emptySubtext: { fontSize: 13, color: Colors.ink2, marginTop: 4 },
+  radarScroll: { paddingBottom: 4, gap: 12 },
+  smallCard: {
+    backgroundColor: Colors.card, borderRadius: 18, padding: 14, width: 130,
+    shadowColor: '#281408', shadowOpacity: 0.06, shadowRadius: 9, elevation: 3,
+  },
+  smallEmoji: { width: 44, height: 44, borderRadius: 14, justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
+  smallTitle: { fontSize: 13, fontWeight: '800', color: Colors.ink, letterSpacing: -0.2 },
+  smallDest: { fontSize: 11, color: Colors.ink2, marginTop: 3 },
 });
