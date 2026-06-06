@@ -15,14 +15,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tripmate.app"
+      "bundleIdentifier": "com.austinshen.tripmate"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FF6B6B"
       },
-      "package": "com.tripmate.app",
+      "package": "com.austinshen.tripmate",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
